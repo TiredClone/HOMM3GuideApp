@@ -3,6 +3,8 @@ package com.neolife.homm3guide.screen.settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -10,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -20,11 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.neolife.homm3guide.R
+import com.neolife.homm3guide.screen.Screen
 
 @Composable
-fun SettingsScreen(navController: NavController){
-        Row (horizontalArrangement = Arrangement.Start,
-            modifier = Modifier.padding(top = 30.dp)){
+fun SettingsScreen(navController: NavController) {
+    Column {
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.padding(top = 30.dp)
+        ) {
 
             TextButton(
                 onClick = {
@@ -48,14 +55,24 @@ fun SettingsScreen(navController: NavController){
                 modifier = Modifier.padding(start = 90.dp)
             )
         }
-
-    Column(modifier = Modifier.padding(top = 20.dp)) {
-        TextButton(onClick = { /*TODO*/ }) {
-            Icon(imageVector = Icons.Filled.Build ,
-                contentDescription = stringResource(id = R.string.settings_tables_button),
-                modifier = Modifier.size(30.dp, 30.dp))
+        Column(modifier = Modifier.padding(top = 20.dp, start = 20.dp)) {
+            TextButton(
+                onClick = {navController.navigate(Screen.TableSettingsScreen.route)}){
+                Icon(
+                    imageVector = Icons.Filled.Build,
+                    contentDescription = stringResource(id = R.string.settings_tables_button),
+                    modifier = Modifier.size(32.dp, 32.dp)
+                )
+                Text(
+                    text = "Table settings",
+                    modifier = Modifier.padding(start = 10.dp),
+                    fontSize = 20.sp
+                )
+            }
         }
+
     }
+
 }
 
 

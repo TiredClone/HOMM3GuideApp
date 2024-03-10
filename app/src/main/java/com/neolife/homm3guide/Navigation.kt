@@ -5,18 +5,22 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.neolife.homm3guide.database.DBHelper
 import com.neolife.homm3guide.screen.Screen
 import com.neolife.homm3guide.screen.aboutApp.AboutAppScreen
 import com.neolife.homm3guide.screen.aboutCreator.AboutAppCreatorScreen
 import com.neolife.homm3guide.screen.tableSettings.tableSettingsScreen
 import com.neolife.homm3guide.screen.home.HomeScreen
+import com.neolife.homm3guide.screen.post.postScreen
 import com.neolife.homm3guide.screen.settings.SettingsScreen
 
 @Composable
-fun Navigation() {
+fun Navigation(db: DBHelper) {
     val navController = rememberNavController()
 
     NavHost(
@@ -24,10 +28,15 @@ fun Navigation() {
         startDestination = Screen.HomeScreen.route
     ) {
         composable(route = Screen.HomeScreen.route) {
-            HomeScreen(navController = navController)
+            HomeScreen(navController = navController, db)
         }
         composable(route = Screen.AboutAppCreator.route) {
             AboutAppCreatorScreen(navController = navController)
+        }
+        composable(route = Screen.PostScreen.route, arguments = listOf(navArgument("post_id") { type = NavType.IntType })) {
+            backStackEntry ->
+            backStackEntry.arguments?.getInt("post_id")
+                ?.let { postScreen(navController = navController, db, it) }
         }
 
         composable(route = Screen.AboutAppScreen.route) {

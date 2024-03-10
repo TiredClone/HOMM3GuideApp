@@ -7,4 +7,6 @@ sealed class Screen(val route: String)
     data object AboutAppScreen: Screen("AboutAppScreen")
     data object SettingsScreen: Screen("SettingsScreen")
     data object TableSettingsScreen: Screen("tableSettingsScreen")
+
+    data object PostScreen: Screen("postScreen/{post_id}")
 }

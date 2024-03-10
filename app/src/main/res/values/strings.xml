@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">HOMM3Guide</string>
+    <string name="avatar_description">avatar</string>
+    <string name="arrow_button">back</string>
+    <string name="settings_button">settings</string>
+    <string name="settings_tables_button">settings_tables</string>
+</resources>

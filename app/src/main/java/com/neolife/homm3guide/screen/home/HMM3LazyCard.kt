@@ -8,14 +8,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.neolife.homm3guide.database.CardInfoModel
+import com.neolife.homm3guide.database.DBHelper
 
 @Composable
 fun HMM3CardList(
-    dataList : List<CardInfoModel>, navController: NavController
+    dataList : List<CardInfoModel>, navController: NavController, db: DBHelper
 ) {
     LazyColumn() {
         items(dataList) { data ->
-            HMM3Card(data = data, navController)
+            HMM3Card(data = data, navController, db)
         }
     }
 }

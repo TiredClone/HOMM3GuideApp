@@ -8,5 +8,9 @@ sealed class Screen(val route: String)
     data object SettingsScreen: Screen("SettingsScreen")
     data object TableSettingsScreen: Screen("tableSettingsScreen")
 
+    data object AddPostScreen: Screen("editPostScreen")
+
+    data object EditPostScreen: Screen("editPostScreen/{post_id}")
+
     data object PostScreen: Screen("postScreen/{post_id}")
 }

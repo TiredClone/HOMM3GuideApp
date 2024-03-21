@@ -94,9 +94,3 @@ fun AboutAppCreatorScreen(navController: NavController) {
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun aboutAppPreview(){
-    AboutAppCreatorScreen(navController = rememberNavController())
-}

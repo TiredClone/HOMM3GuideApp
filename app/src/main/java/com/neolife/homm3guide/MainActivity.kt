@@ -15,7 +15,7 @@ import com.neolife.homm3guide.ui.theme.HOMM3GuideTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var db = DBHelper(this);
+        val db = DBHelper(this);
         setContent {
             HOMM3GuideTheme {
                 // A surface container using the 'background' color from the theme

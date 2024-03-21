@@ -1,10 +1,12 @@
 package com.neolife.homm3guide.database;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,48 +23,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String createPostQuery = "CREATE TABLE post (id INTEGER PRIMARY KEY,name TEXT, markdown_text TEXT);";
         String createCardQuery = "CREATE TABLE card (id INTEGER PRIMARY KEY,name TEXT,caption TEXT,post_id INTEGER,FOREIGN KEY(post_id) REFERENCES post(id));";
-//        String createSettingsQuery = "CREATE TABLE settings (id INTEGER PRIMARY KEY,name TEXT,value TEXT);";
+        String createHomeQuery = "CREATE TABLE home (id INTEGER PRIMARY KEY,card_id INTEGER, FOREIGN KEY(card_id) REFERENCES card(id));";
+        //        String createSettingsQuery = "CREATE TABLE settings (id INTEGER RIMARY KEY,name TEXT,value TEXT);";
         db.execSQL(createPostQuery);
         db.execSQL(createCardQuery);
-
-        db.execSQL("INSERT INTO post (name, markdown_text) values ('test bro test', '# Markdown Example\n" +
-                "\n" +
-                "This is a **Markdown** example demonstrating various formatting options:\n" +
-                "\n" +
-                "## Lists\n" +
-                "\n" +
-                "- **Ordered List:**\n" +
-                "  1. First item\n" +
-                "  2. Second item\n" +
-                "  3. Third item\n" +
-                "\n" +
-                "- **Unordered List:**\n" +
-                "  - Item 1\n" +
-                "  - Item 2\n" +
-                "  - Item 3\n" +
-                "\n" +
-                "## Text Formatting\n" +
-                "\n" +
-                "- *Italic Text*\n" +
-                "- **Bold Text**\n" +
-                "- ~~Strikethrough Text~~\n" +
-                "\n" +
-                "## Links and Images\n" +
-                "\n" +
-                "- [Link to Google](https://www.google.com)\n" +
-                "- ![Markdown Logo](https://markdown-here.com/img/icon256.png)\n" +
-                "\n" +
-                "## Code\n" +
-                "\n" +
-                "Inline code: `print(\"Hello, Markdown!\")`\n" +
-                "\n" +
-                "Block code:\n" +
-                "```python\n" +
-                "def greet():\n" +
-                "    print(\"Hello, Markdown!\")\n" +
-                "greet() ')");
-        db.execSQL("INSERT INTO card (name, caption, post_id) values ('test', 'wow, test', 1)");
-        db.execSQL("INSERT INTO card (name, caption) values ('omagadable', 'this is amazing')");
+        db.execSQL(createHomeQuery);
 //        db.execSQL(createSettingsQuery);
     }
 
@@ -70,6 +35,32 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //TODO
     }
+
+    public List<CardInfoModel> getAllCardsFromHome() {
+        List<CardInfoModel> res = new ArrayList<>();
+
+        String query = "SELECT * FROM home;";
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        @SuppressLint("Recycle") Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst())
+        {
+            do {
+                int card_id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                String caption = cursor.getString(2);
+                int post_id = cursor.getInt(3);
+
+                CardInfoModel newCard = new CardInfoModel(card_id,name,caption,post_id);
+                res.add(newCard);
+            }while (cursor.moveToNext());
+        }  //hz che tut poka dobavity. tut kodgda nichevo ne srabotalo
+
+
+        return res;
+    }
+
 
     public List<CardInfoModel> getAllCards() {
         List<CardInfoModel> res = new ArrayList<>();
@@ -90,19 +81,68 @@ public class DBHelper extends SQLiteOpenHelper {
                 CardInfoModel newCard = new CardInfoModel(card_id,name,caption,post_id);
                 res.add(newCard);
             }while (cursor.moveToNext());
-        } else {
-            //hz che tut poka dobavity. tut kodgda nichevo ne srabotalo
-        }
+        }  //hz che tut poka dobavity. tut kodgda nichevo ne srabotalo
+
 
         return res;
     }
 
+    public void removeCard(int post_id) {
+        String query = "DELETE FROM card WHERE id = ?";
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query, new String[]{String.valueOf(post_id)});
+        db.execSQL("DELETE FROM post WHERE id = ?", new String[]{String.valueOf(post_id)});
+    }
+
+    public void updateCardAndPost(String name, String caption, String header, String markdown_text, int post_id){
+        String query = "SELECT * FROM card WHERE post_id = ?;";
+        SQLiteDatabase db = this.getReadableDatabase();
+        CardInfoModel res = new CardInfoModel();
+        @SuppressLint("Recycle") Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(post_id)});
+
+        if (cursor.moveToFirst())
+        {
+            do {
+                int id = cursor.getInt(0);
+                String fname = cursor.getString(1);
+                String fcaption = cursor.getString(2);
+                int ppost_id = cursor.getInt(3);
+
+                res = new CardInfoModel(id, fname, fcaption, ppost_id);
+            } while (cursor.moveToNext());
+        } else {
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("name",header);
+        values.put("markdown_text",markdown_text);
+
+        ContentValues values2 = new ContentValues();
+        values2.put("name",name);
+        values2.put("caption",caption);
+
+        db.update("post",values,"id = ?", new String[]{String.valueOf(post_id)});
+        db.update("card",values2,"id = ?", new String[]{String.valueOf(res.getPost_id())});
+    }
+
+    public void createCardAndPost(String name, String caption, String header, String markdown_text) {
+        String queryCreateCard = "INSERT INTO card (name, caption, post_id) VALUES (?,?,?)";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name",header);
+        values.put("markdown_text",markdown_text);
+        long t = db.insert("post", null, values);
+        Log.d("info", String.valueOf(t));
+        db.execSQL(queryCreateCard, new String[]{name, caption, String.valueOf(t)});
+    }
+
     public PostInfoModel getPostById(int post_id) {
-        PostInfoModel res = new PostInfoModel();
 
         String query = "SELECT * FROM post WHERE id = ?;";
         SQLiteDatabase db = this.getReadableDatabase();
-
+        PostInfoModel res = new PostInfoModel(9999999, "untitled", "There's no **TEXT**");
         @SuppressLint("Recycle") Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(post_id)});
 
         if (cursor.moveToFirst())
@@ -113,13 +153,32 @@ public class DBHelper extends SQLiteOpenHelper {
                 String text = cursor.getString(2);
 
                 res = new PostInfoModel(id, name, text);
-
-
             } while (cursor.moveToNext());
         }
 
         return res;
     }
 
+    public CardInfoModel getCardById(int post_id) {
+
+        String query = "SELECT * FROM card WHERE post_id = ?;";
+        SQLiteDatabase db = this.getReadableDatabase();
+        CardInfoModel res = new CardInfoModel();
+        @SuppressLint("Recycle") Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(post_id)});
+
+        if (cursor.moveToFirst())
+        {
+            do {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                String caption = cursor.getString(2);
+                int ppost_id = cursor.getInt(3);
+
+                res = new CardInfoModel(id, name, caption, ppost_id);
+            } while (cursor.moveToNext());
+        }
+
+        return res;
+    }
 
 }

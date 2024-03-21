@@ -4,4 +4,6 @@
     <string name="arrow_button">back</string>
     <string name="settings_button">settings</string>
     <string name="settings_tables_button">settings_tables</string>
+    <string name="floating_action_button">Extended floating action button</string>
+    <string name="about">about</string>
 </resources>

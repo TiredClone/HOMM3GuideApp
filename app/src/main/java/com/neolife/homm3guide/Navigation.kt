@@ -16,6 +16,7 @@ import com.neolife.homm3guide.screen.aboutApp.AboutAppScreen
 import com.neolife.homm3guide.screen.aboutCreator.AboutAppCreatorScreen
 import com.neolife.homm3guide.screen.tableSettings.tableSettingsScreen
 import com.neolife.homm3guide.screen.home.HomeScreen
+import com.neolife.homm3guide.screen.post.editPostScreen
 import com.neolife.homm3guide.screen.post.postScreen
 import com.neolife.homm3guide.screen.settings.SettingsScreen
 
@@ -45,6 +46,16 @@ fun Navigation(db: DBHelper) {
 
         composable(route = Screen.SettingsScreen.route) {
             SettingsScreen(navController = navController)
+        }
+
+        composable(route = Screen.AddPostScreen.route) {
+            editPostScreen(navController = navController, db, null)
+        }
+
+        composable(route = Screen.EditPostScreen.route, arguments = listOf(navArgument("post_id") { type = NavType.IntType })) {
+                backStackEntry ->
+            backStackEntry.arguments?.getInt("post_id")
+                ?.let { editPostScreen(navController = navController, db, it) }
         }
 
         composable(route = Screen.TableSettingsScreen.route) {
